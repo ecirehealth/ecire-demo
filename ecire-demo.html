@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Écire Health</title>
+  <meta name="description" content="Longevity through alignment — where visible vitality is the expression of metabolic integrity." />
+  <meta name="theme-color" content="#080C16" />
+  <meta property="og:title" content="Écire Health" />
+  <meta property="og:description" content="A clinically rigorous, physician-scientist–designed metabolic restoration system." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body, #root { min-height: 100vh; background: #080C16; }
+    body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; overflow-x: hidden; }
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(196,168,255,0.15); border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script type="text/babel">
+const { useState, useEffect, useCallback, useRef } = React;
+
+/* Fonts loaded via HTML head */
+
+/* ── Palette ── */
+const P = {
+  bg: "#080C16", bgCard: "#0f1424", bgInput: "#141a2e",
+  border: "rgba(156,126,200,0.08)",
+  text: "#e4e8f0", textSoft: "#c0c8d8", textDim: "#6a7a94", textMuted: "#3e4e64",
+  lavender: "#7B5EA7", accent: "#c4a8ff", accentDeep: "#9B7EC8",
+  green: "#4ade80", blue: "#4a90e2", pink: "#ec4899", amber: "#fbbf24",
+  hit: "#6dbb8a", purple: "#7B5EA7",
+  r: 4,
+};
+const sf = "'Cormorant Garamond', Georgia, serif";
+const sn = "'DM Sans', -apple-system, sans-serif";
+
+/* ── Orbital Mark ── */
+const OM = ({ size = 28, variant = "icon", color = P.accent, colorDeep = P.accentDeep, animate = false }) => {
+  const c = size / 2, r = size * 0.32, dot = variant === "icon";
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      {animate && <style>{`
+        @keyframes omS{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+        @keyframes omR{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}
+        @keyframes omP{0%,100%{opacity:.2}50%{opacity:.5}}
+        @keyframes omG{0%,100%{opacity:.6}50%{opacity:1}}
+      `}</style>}
+      <defs><radialGradient id="omGl" cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor={color} stopOpacity={.1}/><stop offset="100%" stopColor={color} stopOpacity={0}/></radialGradient></defs>
+      {animate && <circle cx={c} cy={c} r={r * 1.4} fill="url(#omGl)" />}
+      <g style={animate ? { animation: `omS 60s linear infinite`, transformOrigin: `${c}px ${c}px` } : {}}>
+        <circle cx={c} cy={c} r={r} fill="none" stroke={color} strokeWidth={.5} opacity={.2} />
+      </g>
+      <g style={animate ? { animation: `omR 45s linear infinite`, transformOrigin: `${c}px ${c}px` } : {}}>
+        <ellipse cx={c} cy={c} rx={r * .98} ry={r * .39} fill="none" stroke={color} strokeWidth={.6} opacity={.15} />
+      </g>
+      <g style={animate ? { animation: `omS 55s linear infinite`, transformOrigin: `${c}px ${c}px` } : {}}>
+        <ellipse cx={c} cy={c} rx={r * .94} ry={r * .44} fill="none" stroke={colorDeep} strokeWidth={.5} opacity={.12} transform={`rotate(60 ${c} ${c})`} />
+      </g>
+      <g style={animate ? { animation: `omR 50s linear infinite`, transformOrigin: `${c}px ${c}px` } : {}}>
+        <ellipse cx={c} cy={c} rx={r * .89} ry={r * .36} fill="none" stroke={color} strokeWidth={.4} opacity={.1} transform={`rotate(-30 ${c} ${c})`} />
+      </g>
+      {dot && <circle cx={c} cy={c} r={size * .025} fill={color} opacity={.6} style={animate ? { animation: `omG 4s ease infinite` } : {}} />}
+      {[0, 72, 144, 216, 288].map((deg, i) => {
+        const rd = deg * Math.PI / 180;
+        return <circle key={i} cx={c + r * Math.cos(rd)} cy={c + r * Math.sin(rd)} r={size * .02} fill={color} opacity={.3}
+          style={animate ? { animation: `omP 3s ease ${i * .6}s infinite` } : {}} />;
+      })}
+      {variant === "brand" && <text x={c} y={c + size * .05} textAnchor="middle" fill={P.textSoft} fontSize={size * .28} fontFamily={sf} fontWeight="300" letterSpacing={size * .02} opacity={.85}>ÉCIRE</text>}
+      {variant === "full" && <><text x={c} y={c + size * .03} textAnchor="middle" fill={P.textSoft} fontSize={size * .28} fontFamily={sf} fontWeight="300" letterSpacing={size * .02} opacity={.85}>ÉCIRE</text>
+        <text x={c} y={c + size * .14} textAnchor="middle" fill={P.textDim} fontSize={size * .1} fontFamily={sn} fontWeight="400" letterSpacing={size * .015} opacity={.5}>HEALTH</text></>}
+    </svg>
+  );
+};
+
+/* ── Animated counter hook ── */
+const useCounter = (target, duration = 1200, delay = 400) => {
+  const [val, setVal] = useState(0);
+  const started = useRef(false);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      started.current = true;
+      const start = performance.now();
+      const tick = (now) => {
+        const p = Math.min((now - start) / duration, 1);
+        const ease = 1 - Math.pow(1 - p, 3);
+        setVal(Math.round(target * ease));
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }, delay);
+    return () => clearTimeout(timer);
+  }, [target, duration, delay]);
+  return val;
+};
+
+/* ── Animated progress bar ── */
+const APB = ({ target, color, delay = 500, h = 5 }) => {
+  const [w, setW] = useState(0);
+  useEffect(() => { const t = setTimeout(() => setW(target), delay); return () => clearTimeout(t); }, [target, delay]);
+  return (
+    <div style={{ width: "100%", height: h, background: P.bgInput, borderRadius: P.r, overflow: "hidden" }}>
+      <div style={{ height: "100%", width: (w * 100) + "%", background: color || P.accent + "80", borderRadius: P.r, transition: `width ${800 + delay * 0.3}ms cubic-bezier(0.25,0.46,0.45,0.94)` }} />
+    </div>
+  );
+};
+
+/* ── Small UI ── */
+const Badge = ({ children, color = P.accent }) => (
+  <span style={{ display: "inline-block", padding: "3px 8px", borderRadius: P.r, fontSize: 8, fontWeight: 500, letterSpacing: 1.5, textTransform: "uppercase", color, background: color + "10", border: "1px solid " + color + "18", fontFamily: sn }}>{children}</span>
+);
+
+/* ── Scroll hint — shows when content extends below fold ── */
+const ScrollHint = ({ step }) => {
+  const [show, setShow] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    const check = () => {
+      const el = document.scrollingElement || document.documentElement;
+      const scrollable = el.scrollHeight > el.clientHeight + 80;
+      const nearTop = el.scrollTop < 60;
+      setShow(scrollable && nearTop);
+    };
+    check();
+    const t = setTimeout(check, 800);
+    window.addEventListener("scroll", check, { passive: true });
+    return () => { clearTimeout(t); window.removeEventListener("scroll", check); };
+  }, [step]);
+  if (!show) return null;
+  return (
+    <div style={{ position: "fixed", bottom: 100, right: 14, zIndex: 90, animation: "scrollBounce 2s ease infinite", pointerEvents: "none" }}>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1, opacity: 0.4 }}>
+        <span style={{ fontSize: 12, color: P.accent }}>↓</span>
+      </div>
+    </div>
+  );
+};
+
+/* ── Self-contained countdown (doesn't re-render parent) ── */
+const Countdown = ({ duration, playing, step }) => {
+  const [t, setT] = useState(duration);
+  useEffect(() => { setT(duration); }, [duration, step]);
+  useEffect(() => {
+    if (!playing) return;
+    const iv = setInterval(() => setT(p => Math.max(p - 1, 0)), 1000);
+    return () => clearInterval(iv);
+  }, [playing, step]);
+  if (!playing) return null;
+  return <span style={{ fontSize: 9, color: P.textMuted, fontFamily: sn, minWidth: 16, textAlign: "center" }}>{t}s</span>;
+};
+
+/* ── NARRATION OVERLAY ── */
+const Narration = ({ header, sub }) => (
+  <div style={{
+    position: "relative", marginBottom: 22, padding: "20px 22px 18px",
+    background: "linear-gradient(135deg, rgba(123,94,167,0.08), rgba(196,168,255,0.03))",
+    borderRadius: P.r, border: "1px solid " + P.accent + "18",
+    backdropFilter: "blur(8px)",
+  }}>
+    {/* Tour guide indicator */}
+    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
+      <div style={{ width: 6, height: 6, borderRadius: "50%", background: P.accent, animation: "pulse 2s ease infinite", boxShadow: "0 0 8px " + P.accent + "40" }} />
+      <span style={{ fontSize: 7.5, letterSpacing: 3, textTransform: "uppercase", color: P.accent, fontWeight: 500, fontFamily: sn }}>Demo Guide</span>
+    </div>
+    <h2 style={{ fontFamily: sf, fontSize: "1.3rem", fontWeight: 300, color: "#fff", margin: "0 0 6px", lineHeight: 1.5, letterSpacing: .3 }}>{header}</h2>
+    <p style={{ fontFamily: sn, fontSize: 11, color: P.textSoft, margin: 0, lineHeight: 1.8 }}>{sub}</p>
+    {/* Glow edge */}
+    <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: `linear-gradient(90deg, transparent, ${P.accent}30, transparent)` }} />
+  </div>
+);
+
+/* ── Animated metric card ── */
+const AMC = ({ label, value, sub, color, icon, delay = 400 }) => {
+  const [show, setShow] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setShow(true), delay); return () => clearTimeout(t); }, [delay]);
+  return (
+    <div style={{
+      background: P.bgInput, border: "1px solid " + P.border, borderRadius: P.r,
+      padding: "14px 12px", textAlign: "center",
+      opacity: show ? 1 : 0, transform: show ? "translateY(0)" : "translateY(8px)",
+      transition: "opacity .5s ease, transform .5s ease",
+    }}>
+      <div style={{ fontSize: 9, color: P.textDim, textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 5, fontFamily: sn }}>{icon} {label}</div>
+      <div style={{ fontSize: "1.5rem", fontWeight: 300, fontFamily: sf, color: color || P.accent, lineHeight: 1 }}>{value}</div>
+      {sub && <div style={{ fontSize: 9, color: P.textDim, marginTop: 4, fontFamily: sn, lineHeight: 1.4 }}>{sub}</div>}
+    </div>
+  );
+};
+
+/* ═══ STEPS ═══ */
+const STEPS = [
+  { id: "welcome", label: "Welcome", dur: 9 },
+  { id: "data", label: "The Data", dur: 14 },
+  { id: "dashboard", label: "Dashboard", dur: 15 },
+  { id: "messages", label: "Messages", dur: 14 },
+  { id: "tracker", label: "Tracker", dur: 12 },
+  { id: "meals", label: "Meals", dur: 14 },
+  { id: "ritual", label: "Ritual", dur: 12 },
+  { id: "science", label: "Science", dur: 12 },
+  { id: "mtor", label: "mTOR", dur: 14 },
+  { id: "cycle", label: "Cycle", dur: 14 },
+  { id: "close", label: "Close", dur: 16 },
+];
+
+function EcireDemo() {
+  const [step, setStep] = useState(0);
+  const [exp, setExp] = useState(null);
+  const [playing, setPlaying] = useState(true);
+  const stepRef = useRef(0);
+  const timerRef = useRef(null);
+  const playRef = useRef(true);
+
+  /* Stable navigation — no dependency on step state */
+  const advance = useCallback(() => {
+    if (stepRef.current < STEPS.length - 1) {
+      const ns = stepRef.current + 1;
+      stepRef.current = ns;
+      setStep(ns); setExp(null);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      playRef.current = false; setPlaying(false);
+      clearTimeout(timerRef.current);
+    }
+  }, []);
+
+  const goTo = useCallback((n) => {
+    clearTimeout(timerRef.current);
+    const ns = Math.max(0, Math.min(n, STEPS.length - 1));
+    stepRef.current = ns;
+    setStep(ns); setExp(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
+  const goPrev = useCallback(() => {
+    if (stepRef.current > 0) goTo(stepRef.current - 1);
+  }, [goTo]);
+
+  /* Auto-play — starts a fresh timeout whenever step or playing changes */
+  useEffect(() => {
+    clearTimeout(timerRef.current);
+    if (!playing) return;
+    timerRef.current = setTimeout(advance, STEPS[step].dur * 1000);
+    return () => clearTimeout(timerRef.current);
+  }, [step, playing, advance]);
+
+  /* Keyboard */
+  useEffect(() => {
+    const h = (e) => {
+      if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); advance(); }
+      if (e.key === "ArrowLeft") { e.preventDefault(); goPrev(); }
+      if (e.key === "p") { playRef.current = !playRef.current; setPlaying(p => !p); }
+    };
+    window.addEventListener("keydown", h);
+    return () => window.removeEventListener("keydown", h);
+  }, [advance, goPrev]);
+
+  /* Content wrapper uses key={step} for clean mount/unmount — no flashing */
+
+  /* ─── 1. WELCOME ─── */
+  const S0 = () => (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "72vh", textAlign: "center", padding: "0 24px" }}>
+      <div style={{ opacity: 0, animation: "fu .8s ease .2s forwards" }}><OM size={130} variant="icon" animate /></div>
+      <div style={{ opacity: 0, animation: "fu .7s ease .6s forwards" }}>
+        <h1 style={{ fontFamily: sf, fontSize: "2.4rem", fontWeight: 300, color: P.text, letterSpacing: 8, margin: "12px 0 4px" }}>ÉCIRE</h1>
+        <div style={{ fontFamily: sn, fontSize: 10, letterSpacing: 3, color: P.textDim, textTransform: "uppercase" }}>HEALTH</div>
+      </div>
+      <div style={{ width: 40, height: 1, background: P.accent + "30", margin: "28px auto", opacity: 0, animation: "fu .5s ease .9s forwards" }} />
+      <p style={{ fontFamily: sf, fontSize: 17, fontWeight: 300, color: P.textSoft, lineHeight: 2, maxWidth: 380, opacity: 0, animation: "fu .7s ease 1.1s forwards" }}>
+        Longevity through alignment — where visible vitality is the expression of metabolic integrity.
+      </p>
+      <div style={{ opacity: 0, animation: "fu .5s ease 1.6s forwards", marginTop: 20 }}>
+        <Badge color={P.accent}>Founded by Dr. Gmerice Hammond, MD, MPH</Badge>
+      </div>
+      <div style={{ opacity: 0, animation: "fu .5s ease 1.9s forwards", marginTop: 14 }}>
+        <p style={{ fontFamily: sn, fontSize: 11, color: P.textDim, letterSpacing: 1, lineHeight: 2, textAlign: "center", maxWidth: 340 }}>A clinically rigorous, physician-scientist–designed metabolic restoration system.</p>
+      </div>
+      <div style={{ opacity: 0, animation: "fu .5s ease 2.2s forwards", marginTop: 16 }}>
+        <p style={{ fontFamily: sn, fontSize: 10, color: P.textDim, letterSpacing: 1, lineHeight: 2.2, textAlign: "center", maxWidth: 340 }}>Not a tactic. Not a trick. Not a trend. Not a macro split. Not a biohack.<br/>System coherence.</p>
+      </div>
+      <div style={{ opacity: 0, animation: "fu .5s ease 2.6s forwards", marginTop: 28 }}>
+        <p style={{ fontFamily: sn, fontSize: 10, color: P.textMuted, letterSpacing: 1 }}>Tap Next or use arrow keys to begin {"→"}</p>
+      </div>
+    </div>
+  );
+
+  /* ─── 2. THE DATA ─── */
+  const S1 = () => (
+    <div>
+      <Narration header={"“This is why Écire exists.”"} sub="The metabolic burden Black women carry — and the system that ignores it." />
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 18 }}>
+        <AMC label="Obesity Rate" value="57%" sub="vs 33% white women" color={P.accent} icon="" delay={300} />
+        <AMC label="Type 2 Diabetes" value={"×2"} sub="the rate" color={P.pink} icon="" delay={500} />
+        <AMC label="CVD Before 55" value="40%" sub="vs 21% white women" color="#e8a87c" icon="" delay={700} />
+        <AMC label="Biological Aging" value="+7.5y" sub="faster at cellular level" color={P.amber} icon="" delay={900} />
+      </div>
+      <div style={{ background: P.accent + "06", borderRadius: P.r, padding: "18px 20px", border: "1px solid " + P.accent + "10", marginBottom: 18 }}>
+        <p style={{ fontFamily: sf, fontSize: 14, fontWeight: 300, fontStyle: "italic", color: P.accent, lineHeight: 2, margin: 0, textAlign: "center" }}>
+          These aren{"’"}t genetic inevitabilities. They are metabolic consequences of systemic gaps {"—"} in access, in research representation, in the quality of care received.
+        </p>
+      </div>
+      {[{ t: "Highest maternal mortality rate of any demographic group", c: P.pink },
+        { t: "Least represented in the clinical research that shapes their protocols", c: P.blue },
+        { t: "Disproportionate allostatic load — systemic stress measured in cortisol, insulin, and cellular aging", c: P.accent },
+      ].map((d, i) => (
+        <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "12px 14px", background: d.c + "06", borderRadius: P.r, border: "1px solid " + d.c + "12", marginBottom: 8, opacity: 0, animation: `fu .5s ease ${1 + i * .2}s forwards` }}>
+          <div style={{ width: 5, height: 5, borderRadius: 3, background: d.c, flexShrink: 0, marginTop: 6 }} />
+          <span style={{ fontFamily: sn, fontSize: 11.5, color: P.textSoft, lineHeight: 1.7 }}>{d.t}</span>
+        </div>
+      ))}
+      <div style={{ background: P.lavender + "08", borderRadius: P.r, padding: "14px 18px", border: "1px solid " + P.lavender + "12", marginTop: 10 }}>
+        <p style={{ fontFamily: sf, fontSize: 13, fontWeight: 300, color: P.textSoft, lineHeight: 2, margin: 0, textAlign: "center" }}>Écire is a clinically rigorous metabolic restoration system designed to interrupt generational chronic disease.</p>
+      </div>
+    </div>
+  );
+  const S2 = () => {
+    const tre = useCounter(16, 1000, 500);
+    const prot = useCounter(142, 1200, 700);
+    const steps = useCounter(8241, 1400, 900);
+    return (
+      <div>
+        <Narration header="Everything your doctor measures. Everything your wearable tracks. One place." sub={"Continuous biometrics. Clinical labs. Aesthetic milestones. Harmonized."} />
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 16 }}>
+          <AMC label="TRE" value={tre + "h"} sub={tre >= 16 ? "✓ Target hit" : "Building..."} color={tre >= 16 ? P.green : P.accent} icon={"⏱"} delay={400} />
+          <AMC label="Protein" value={prot + "g"} sub="8g to go" color={P.blue} icon={"\uD83D\uDCAA"} delay={600} />
+          <AMC label="Steps" value={steps.toLocaleString()} sub="1,759 to go" color={P.accent} icon={"\uD83D\uDEB6"} delay={800} />
+          <AMC label="Sleep" value="7.5h" sub="On target" color={P.lavender} icon={"\uD83D\uDE34"} delay={1000} />
+        </div>
+
+        {/* Clinical */}
+        <div style={{ display: "flex", alignItems: "center", gap: 6, margin: "4px 0 10px" }}>
+          <div style={{ flex: 1, height: 1, background: "linear-gradient(90deg,transparent,#5a9fd425)" }} />
+          <span style={{ fontSize: 8, letterSpacing: 3, color: "#5a9fd4", textTransform: "uppercase", fontWeight: 500, fontFamily: sn }}>Metabolic Health Restoration</span>
+          <div style={{ flex: 1, height: 1, background: "linear-gradient(90deg,#5a9fd425,transparent)" }} />
+        </div>
+        <div style={{ background: P.bgCard, borderRadius: P.r, padding: "14px", border: "1px solid " + P.border, borderTop: "2px solid #5a9fd425", marginBottom: 12 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+            <span style={{ fontFamily: sf, fontSize: 13, fontWeight: 400, color: "#c0c8d4" }}>Clinical Markers</span>
+            <Badge color="#5a9fd4">{"É"}cire EHR</Badge>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+            <AMC label="HbA1c" value="5.4%" sub="Optimal: <5.7%" color={P.green} icon={"\uD83E\uDE78"} delay={1200} />
+            <AMC label="Fasting Glucose" value="92" sub="Optimal: <100" color={P.green} icon={"\uD83D\uDCCA"} delay={1400} />
+            <AMC label="LDL / HDL" value="98 / 62" sub="LDL <100 · HDL >50" color={P.green} icon={"\uD83E\uDDEA"} delay={1600} />
+            <AMC label="hsCRP" value="0.8" sub="Low risk: <1.0" color={P.green} icon={"\uD83D\uDD25"} delay={1800} />
+          </div>
+        </div>
+
+        {/* Wearable */}
+        <div style={{ background: P.bgCard, borderRadius: P.r, padding: "14px", border: "1px solid " + P.border, borderTop: "2px solid " + P.accent + "25", marginBottom: 12 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+            <span style={{ fontFamily: sf, fontSize: 13, fontWeight: 400, color: "#c0c8d4" }}>Wearable Data</span>
+            <Badge color={P.green}>Apple Watch {"·"} Oura</Badge>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+            <AMC label="VO2 Max" value="34" sub="Good: 30–38" color={P.green} icon={"\uD83E\uDEC0"} delay={2000} />
+            <AMC label="Resting HR" value="68" sub="Target: <70" color={P.blue} icon={"\uD83D\uDC93"} delay={2100} />
+            <AMC label="HRV" value="42ms" sub="Autonomic resilience" color={P.accent} icon={"\uD83D\uDCC8"} delay={2200} />
+            <AMC label="Sleep Score" value="84" sub="Deep + REM quality" color={P.lavender} icon={"\uD83C\uDF19"} delay={2300} />
+          </div>
+        </div>
+
+        {/* Body Comp */}
+        <div style={{ background: P.bgCard, borderRadius: P.r, padding: "14px", border: "1px solid " + P.border, borderTop: "2px solid " + P.pink + "25" }}>
+          <span style={{ fontFamily: sf, fontSize: 13, fontWeight: 400, color: "#c0c8d4", display: "block", marginBottom: 10 }}>Body Composition</span>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+            <AMC label="Body Fat %" value="24%" sub={"↓ 3% since start"} color={P.green} icon={"\uD83D\uDCD0"} delay={2400} />
+            <AMC label="Lean Muscle" value="118 lbs" sub={"↑ 4 lbs since start"} color={P.accent} icon={"\uD83D\uDCAA"} delay={2500} />
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 10, paddingTop: 8, borderTop: "1px solid " + P.border }}>
+            <span style={{ fontFamily: sn, fontSize: 12, color: P.green, fontWeight: 500 }}>{"↓"} 12 lbs</span>
+            <span style={{ fontFamily: sn, fontSize: 10, color: P.textDim }}>+4 muscle {"·"} -16 fat</span>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  /* ─── 4. MESSAGES (slide-in) ─── */
+  const S3 = () => {
+    const msgs = [
+      { tp: "broadcast", tc: "#e8a87c", subj: "Monday Momentum", time: "Today, 8:02 AM", ur: true,
+        body: "Good morning, queens. New week. New alignment window. Whatever last week was — it’s composted. Today you plant fresh. Hit your protein by noon, move every 60 minutes, and remember: the protocol is the deficit." },
+      { tp: "group", gr: "REAP Cohort 1", tc: P.accent, subj: "Week 3 Check-In", time: "Yesterday, 6:30 PM", ur: true,
+        body: "Cohort 1 — you’re three weeks in. By now you should be feeling the fasting window get easier. If it’s not, that’s data, not failure. Book a check-in through Écire’s platform this week." },
+      { tp: "direct", tc: P.hit, subj: "Your labs look great", time: "Yesterday, 2:15 PM", ur: false,
+        body: "Hey — just reviewed your latest panel through Écire’s EHR. Your fasting insulin dropped 18% in six weeks. That’s not a small thing. That’s your metabolism waking up." },
+      { tp: "broadcast", tc: "#e8a87c", subj: "Weekend Wisdom", time: "Sat, 9:00 AM", ur: false,
+        body: "Reminder: weekends are not cheat days. They’re practice days. The woman you’re becoming doesn’t take weekends off from sovereignty." },
+    ];
+    return (
+      <div>
+        <Narration header="Your physician, in your pocket." sub="Dr. Hammond communicates directly — broadcasts to everyone, check-ins with your cohort, and private messages about your labs." />
+        <div style={{ display: "flex", gap: 5, marginBottom: 14 }}>
+          {[{ l: "All", n: 5, a: true }, { l: "\uD83D\uDCE2 Broadcast", n: 2 }, { l: "\uD83D\uDC65 Group", n: 2 }, { l: "\uD83D\uDC8C Direct", n: 1 }].map(t => (
+            <div key={t.l} style={{ padding: "5px 10px", borderRadius: P.r, fontSize: 9, fontWeight: 500, fontFamily: sn, background: t.a ? P.accent + "12" : P.bgCard, color: t.a ? P.accent : P.textDim, border: "1px solid " + (t.a ? P.accent + "30" : P.border) }}>{t.l} ({t.n})</div>
+          ))}
+        </div>
+        {msgs.map((m, i) => (
+          <div key={i} style={{
+            background: P.bgCard, borderRadius: P.r, padding: "14px 16px", marginBottom: 10,
+            border: "1px solid " + (m.ur ? P.accent + "18" : P.border), borderLeft: "3px solid " + m.tc,
+            opacity: 0, animation: `slideIn .5s ease ${.3 + i * .25}s forwards`,
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                {m.ur && <div style={{ width: 5, height: 5, borderRadius: 3, background: P.accent }} />}
+                <span style={{ fontSize: 8, letterSpacing: 1.5, textTransform: "uppercase", fontWeight: 500, color: m.tc, fontFamily: sn }}>
+                  {m.tp === "broadcast" ? "\uD83D\uDCE2 Broadcast" : m.tp === "group" ? "\uD83D\uDC65 " + m.gr : "\uD83D\uDC8C Direct"}
+                </span>
+              </div>
+              <span style={{ fontSize: 8, color: P.textMuted, fontFamily: sn }}>{m.time}</span>
+            </div>
+            <div style={{ fontFamily: sf, fontSize: 13, fontWeight: 400, color: m.ur ? "#d0d8e4" : "#8a94a4", marginBottom: 4 }}>{m.subj}</div>
+            <p style={{ fontSize: 11, lineHeight: 1.8, color: P.textDim, margin: 0, fontFamily: sn }}>{m.body}</p>
+            <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 7 }}>
+              <div style={{ width: 16, height: 16, borderRadius: "50%", background: P.accent + "12", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8, color: P.accent, fontFamily: sf, fontWeight: 500 }}>G</div>
+              <span style={{ fontSize: 9, color: P.textMuted, fontFamily: sn }}>Dr. Hammond</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  /* ─── 5. TRACKER (animated bars) ─── */
+  const S4 = () => {
+    const [arcDraw, setArcDraw] = useState(false);
+    useEffect(() => { const t = setTimeout(() => setArcDraw(true), 400); return () => clearTimeout(t); }, []);
+    const sz = 130, cx = 65, cy = 65, r = 50, sw = 10, ci = 2 * Math.PI * r;
+    const items = [
+      { l: "Protein", v: "142g / 150g", p: .95, c: P.blue, i: "\uD83D\uDCAA" },
+      { l: "Cruciferous", v: "3 / 3", p: 1, c: P.green, i: "\uD83E\uDD66" },
+      { l: "5 Colors", v: "4 / 5", p: .8, c: P.accent, i: "\uD83C\uDF08" },
+      { l: "Steps", v: "8,241 / 10,000", p: .82, c: P.lavender, i: "\uD83D\uDEB6" },
+      { l: "Movement Snacks", v: "5 / 8", p: .63, c: P.amber, i: "\uD83D\uDD25" },
+      { l: "Supplements", v: "5 / 6", p: .83, c: "#8a94a4", i: "\uD83D\uDC8A" },
+      { l: "Sleep", v: "7.5h", p: 1, c: P.lavender, i: "\uD83D\uDE34" },
+      { l: "REAP Ritual", v: "4 / 5", p: .8, c: P.accent, i: "✦" },
+    ];
+    return (
+      <div>
+        <Narration header="What a day looks like." sub="No calorie counting. No guesswork. The protocol tracks what actually moves the needle." />
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 18 }}>
+          <div style={{ textAlign: "center" }}>
+            <svg width={sz} height={sz}>
+              <circle cx={cx} cy={cy} r={r} fill="none" stroke={P.bgInput} strokeWidth={sw} />
+              <circle cx={cx} cy={cy} r={r} fill="none" stroke={P.accent + "30"} strokeWidth={sw}
+                strokeDasharray={(ci * 8 / 24) + " " + (ci * 16 / 24)} strokeDashoffset={-ci * (10 / 24)} strokeLinecap="round"
+                style={{ transform: "rotate(-90deg)", transformOrigin: "center" }} />
+              <circle cx={cx} cy={cy} r={r} fill="none" stroke={P.hit} strokeWidth={sw}
+                strokeDasharray={arcDraw ? ((ci * 16 / 24) + " " + (ci * 8 / 24)) : ("0 " + ci)}
+                strokeDashoffset={-ci * (18 / 24)} strokeLinecap="round"
+                style={{ transform: "rotate(-90deg)", transformOrigin: "center", filter: "drop-shadow(0 0 4px " + P.hit + "40)", transition: "stroke-dasharray 1.5s cubic-bezier(0.25,0.46,0.45,0.94)" }} />
+              <text x={cx} y={cy - 8} textAnchor="middle" fill={P.hit} fontSize="20" fontWeight="300" fontFamily={sf}>16h</text>
+              <text x={cx} y={cy + 5} textAnchor="middle" fill={P.textDim} fontSize="8" fontFamily={sn}>FASTING</text>
+              <text x={cx} y={cy + 16} textAnchor="middle" fill={P.textDim} fontSize="7" fontFamily={sn}>8h eating</text>
+            </svg>
+            <div style={{ padding: "3px 10px", borderRadius: P.r, fontSize: 9, fontWeight: 500, color: P.hit, background: P.hit + "10", display: "inline-block", fontFamily: sn, marginTop: 4 }}>8h window {"—"} on target</div>
+          </div>
+        </div>
+        {items.map((t, idx) => (
+          <div key={t.l} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10, opacity: 0, animation: `fu .4s ease ${.6 + idx * .12}s forwards` }}>
+            <div style={{ width: 28, height: 28, borderRadius: "50%", flexShrink: 0, background: t.p >= 1 ? P.green + "10" : t.c + "08", border: "1.5px solid " + (t.p >= 1 ? P.green : t.c + "25"), display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12 }}>
+              {t.p >= 1 ? <span style={{ color: P.green, fontSize: 10, fontWeight: 500 }}>{"✓"}</span> : t.i}
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
+                <span style={{ fontSize: 11, color: t.p >= 1 ? P.green : P.text, fontWeight: t.p >= 1 ? 500 : 400, fontFamily: sn }}>{t.l}</span>
+                <span style={{ fontSize: 9, color: t.p >= 1 ? P.green : P.textDim, fontWeight: 500, fontFamily: sn }}>{t.v}</span>
+              </div>
+              <APB target={t.p} color={t.p >= 1 ? P.green + "80" : t.c + "50"} delay={700 + idx * 150} />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  /* ─── 6. MEALS / ESSENTIALIST PLATE ─── */
+  const SMeals = () => (<div>
+    <Narration header="A playbook for building meals that support your goals." sub="The Essentialist Plate™ gives you the foundations for structuring meals that support your goals — so you can create from a framework, not follow a script. We also provide key recipes and plates, with adjustments for budget and time constraints, and ways to make sure you miss no flavor and get all the benefit from every bite." />
+    <div style={{ textAlign: "center", marginBottom: 18 }}>
+      <h3 style={{ fontFamily: sf, fontSize: "1.4rem", fontWeight: 300, color: P.text, letterSpacing: 1, margin: "0 0 4px" }}>The Essentialist Plate{"™"}</h3>
+      <p style={{ fontFamily: sn, fontSize: 11, color: P.textDim, fontStyle: "italic" }}>Real, whole foods. Phytonutrient-rich. Biodiverse. Alive.</p>
+    </div>
+    <div style={{ background: P.bgCard, borderRadius: P.r, padding: "16px", border: "1px solid " + P.border, marginBottom: 16 }}>
+      <div style={{ display: "flex", justifyContent: "center", gap: 12, marginBottom: 12, flexWrap: "wrap" }}>
+        {[["Structure", P.blue], ["Timing", P.purple], ["Food Quality", P.green], ["Activators", P.amber]].map(([l, c]) => (<div key={l} style={{ display: "flex", alignItems: "center", gap: 4 }}><div style={{ width: 6, height: 6, borderRadius: 3, background: c + "80" }} /><span style={{ fontSize: 8, color: P.textMuted, letterSpacing: 1, fontFamily: sn }}>{l}</span></div>))}
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+        {[["01", "Protein First", "1g/lb ideal weight", P.blue], ["02", "Low Fat / High Volume", "More volume, less restriction", P.blue], ["03", "Time-Restricted Eating", "6–8h windows", P.purple], ["04", "Complex Carbs at Dinner", "Supports overnight fast", P.purple], ["05", "Whole · Real · Fermented", "Unprocessed choices", P.green], ["06", "5-Color Salad Daily", "Phytonutrient diversity", P.green], ["07", "Cruciferous Vegetables", "3-5 servings/day", P.green], ["08", "The Magic Stardust", "Hemp, chia, flax, nooch", P.green], ["09", "Green Tea + Yerba Mate", "Metabolic activators", P.amber], ["10", "Supplement Stack", "Evidence-based essentials", P.amber]].map(([n, t, d, c], i) => (
+          <div key={n} style={{ padding: "12px 14px", border: "1px solid " + c + "18", borderRadius: P.r, opacity: 0, animation: `fu .35s ease ${.3 + i * .1}s forwards` }}>
+            <div style={{ color: c + "90", fontSize: 20, fontWeight: 300, fontFamily: sf, marginBottom: 1 }}>{n}</div>
+            <div style={{ fontSize: 11.5, fontWeight: 500, color: "#c8d0dc", marginTop: 2, fontFamily: sn }}>{t}</div>
+            <div style={{ fontSize: 9.5, color: P.textDim, marginTop: 2, fontFamily: sn }}>{d}</div>
+          </div>))}
+      </div>
+    </div>
+    {[{ title: "\uD83C\uDF73 The Foundation Breakfast", color: P.blue, sub: "Low-carb to extend overnight fast", items: "Sautéed mushrooms & garlic — 2 whole eggs + 2 whites · Spinach wilted in · Roasted kabocha squash · 1 cup cottage cheese · Magic Stardust · Yerba mate", macros: "~50g protein · ~25g carbs · ~14g fat" },
+      { title: "\uD83E\uDD57 The 5-Color Power Bowl", color: P.purple, sub: "All 5 colors in one meal", items: "6oz chicken or 8oz salmon · Deep green base · Purple cabbage · Yellow peppers · Red tomatoes · Orange carrots · Quinoa or riced cauliflower", macros: "~50g protein · ~35g carbs · ~10g fat" },
+      { title: "\uD83C\uDF7D\uFE0F The Signature Dinner", color: P.pink, sub: "Complex carbs welcome at dinner", items: "8oz lean ground beef or turkey · Large cruciferous veggies · Fermented foods · Quinoa or baked squash · Fresh greens", macros: "~50g protein · ~40g carbs · ~12g fat" },
+    ].map((meal, i) => (<div key={i} style={{ background: P.bgCard, borderRadius: P.r, padding: "16px 18px", marginBottom: 10, borderLeft: "3px solid " + meal.color + "45", border: "1px solid " + P.border, opacity: 0, animation: `slideIn .5s ease ${1.5 + i * .3}s forwards` }}>
+      <div style={{ fontFamily: sf, fontSize: 14, fontWeight: 400, color: meal.color, marginBottom: 3 }}>{meal.title}</div>
+      <div style={{ fontSize: 10, color: P.textDim, marginBottom: 8, fontFamily: sn }}>{meal.sub}</div>
+      <p style={{ fontSize: 11.5, color: P.text, lineHeight: 1.9, opacity: .85, margin: "0 0 8px", fontFamily: sn }}>{meal.items}</p>
+      <p style={{ fontSize: 10, color: P.textMuted, fontStyle: "italic", margin: 0, fontFamily: sn }}>{meal.macros}</p>
+    </div>))}
+    <div style={{ background: P.green + "06", borderRadius: P.r, padding: "14px 16px", border: "1px solid " + P.green + "12" }}>
+      <p style={{ fontFamily: sf, fontSize: 13, fontWeight: 300, fontStyle: "italic", color: P.green, lineHeight: 1.8, margin: 0, textAlign: "center" }}>3 meals {"×"} ~50g = 150g protein. Structure, not restriction.</p>
+    </div>
+  </div>);
+
+  /* ─── 7. REAP RITUAL ─── */
+  const S5 = () => (
+    <div>
+      <Narration header="The practice that anchors the protocol." sub="Before the data, before the tracking — alignment starts here. Every morning." />
+      <div style={{ textAlign: "center", marginBottom: 20 }}>
+        <div style={{ fontSize: 9, letterSpacing: 4, color: P.textDim, textTransform: "uppercase", marginBottom: 10, fontFamily: sn }}>Morning Ritual</div>
+        <h2 style={{ fontSize: 38, fontWeight: 300, letterSpacing: 8, color: "#d0d8e4", margin: "0 0 4px", fontFamily: sf }}>REAP</h2>
+        <p style={{ fontFamily: sn, fontSize: 12, color: P.textDim, fontStyle: "italic", margin: "6px 0 0", lineHeight: 1.8 }}>
+          Reaffirm. Envision. Aspire. Play + Plan.
+        </p>
+        <div style={{ width: 36, height: 1, background: P.accent + "25", margin: "16px auto 0" }} />
+      </div>
+      {[
+        { k: "R", w: "Reaffirm", sub: "Declare who you are. What today is.", color: "#c4a8ff", prompt: "I am reclaiming my metabolic sovereignty. Today I..." },
+        { k: "E", w: "Envision", sub: "See the outcome. The woman at the end of this trajectory.", color: "#8ab4f8", prompt: "I see myself at the end of this journey — the labs, the energy, the body, the peace..." },
+        { k: "A", w: "Aspire", sub: "Your why. Your aspirational self.", color: "#6dbb8a", prompt: "I am doing this because...", quote: "She who has a strong why can conquer any how." },
+        { k: "P", w: "Play", sub: "Move your body in a way that feels good.", color: "#d4a8c4", isPlay: true },
+        { k: "P", w: "Plan", sub: "Map today’s actions. Execute the vision.", color: "#94b8c8", prompt: "Today’s non-negotiables are..." },
+      ].map((s, i) => (
+        <div key={i} style={{ background: P.bgCard, border: "1px solid " + P.border, borderLeft: "3px solid " + s.color + "40", borderRadius: P.r, padding: "16px 18px", marginBottom: 10, cursor: "pointer", opacity: 0, animation: `fu .4s ease ${.3 + i * .15}s forwards` }}
+          onClick={() => setExp(exp === i ? null : i)}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            <div style={{ width: 36, height: 36, borderRadius: P.r, border: "1.5px solid " + s.color + "35", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <span style={{ fontFamily: sf, fontSize: 16, fontWeight: 300, color: s.color + "90" }}>{s.k}</span>
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 14, fontWeight: 500, color: s.color + "dd", fontFamily: sn }}>{s.w}</div>
+              <div style={{ fontSize: 11, color: P.textDim, marginTop: 2, fontFamily: sn }}>{s.sub}</div>
+            </div>
+            <span style={{ fontSize: 10, color: P.textDim, transform: exp === i ? "rotate(180deg)" : "none", transition: "transform .3s" }}>{"▼"}</span>
+          </div>
+          {exp === i && (
+            <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid " + s.color + "12" }}>
+              {s.quote && <p style={{ fontFamily: sf, fontSize: 12, color: s.color, fontStyle: "italic", textAlign: "center", margin: "0 0 10px", opacity: .8 }}>{"“"}{s.quote}{"”"}</p>}
+              {s.isPlay ? (
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 7 }}>
+                  {[{ e: "\uD83D\uDC83", l: "Dance" }, { e: "\uD83C\uDFC3", l: "Run / Stairs" }, { e: "\uD83E\uDD38", l: "Stretch" }, { e: "\uD83E\uDDD8", l: "Yoga flow" }, { e: "\uD83E\uDEA2", l: "Jump rope" }, { e: "\uD83C\uDFB5", l: "1-song party" }].map(o => (
+                    <div key={o.l} style={{ background: P.bgInput, border: "1px solid " + P.border, borderRadius: P.r, padding: "10px 4px", textAlign: "center" }}>
+                      <div style={{ fontSize: 18, marginBottom: 2 }}>{o.e}</div>
+                      <div style={{ fontSize: 8, color: P.textDim, fontFamily: sn }}>{o.l}</div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div>
+                  <p style={{ fontSize: 11, color: s.color + "70", fontStyle: "italic", margin: "0 0 6px", fontFamily: sn }}>{s.prompt}</p>
+                  <div style={{ width: "100%", minHeight: 56, padding: "10px 12px", background: P.bgInput, border: "1px solid " + P.border, borderRadius: P.r, fontSize: 12, color: P.textMuted, fontFamily: sf, lineHeight: 1.8 }}>Write here...</div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      ))}
+      <div style={{ textAlign: "center", marginTop: 14, padding: "14px", background: P.hit + "06", border: "1px solid " + P.hit + "15", borderRadius: P.r }}>
+        <p style={{ fontFamily: sf, fontSize: 14, color: P.hit, margin: 0 }}>Today{"’"}s seeds are planted.</p>
+        <p style={{ fontSize: 11, color: P.textDim, margin: "4px 0 0", fontStyle: "italic", fontFamily: sn }}>What you sow daily, you reap generationally.</p>
+      </div>
+    </div>
+  );
+
+  /* ─── 7. SCIENCE HUB ─── */
+  const S6 = () => (
+    <div>
+      <Narration header="The knowledge that makes the transformation yours to keep." sub="Peer-reviewed metabolic science — not wellness trends. Every recommendation has a reason." />
+      <div style={{ display: "flex", gap: 0, marginBottom: 18, borderBottom: "1px solid " + P.border }}>
+        {["Foundations", "Your Cycle", "Allostatic Load", "Metabolic Equity"].map((t, i) => (
+          <div key={t} style={{ flex: 1, textAlign: "center", padding: "10px 0", fontSize: 9.5, fontWeight: i === 0 ? 500 : 400, letterSpacing: 1, color: i === 0 ? P.accent : P.textMuted, fontFamily: sn, borderBottom: i === 0 ? "2px solid " + P.accent : "2px solid transparent" }}>{t}</div>
+        ))}
+      </div>
+      {[
+        { g: "Understanding Your Metabolism", c: "#5a9fd4", cards: [{ t: "Insulin Resistance", d: "The hidden driver" }, { t: "Chronic Inflammation", d: "Stress blocks fat burning" }, { t: "Metabolic Agility", d: "Fat/carb fuel switching" }, { t: "Metabolic Adaptation", d: "Crash diet damage" }, { t: "mTOR — The Growth Switch", d: "Build muscle or repair cells", hi: true }] },
+        { g: "Movement & Activity", c: P.accent, cards: [{ t: "Zone 2 Cardio", d: "Fat burning sweet spot" }, { t: "Muscle Loss & BMR", d: "3-5% per decade after 30" }, { t: "NEAT Activity", d: "3-4× more than the gym" }, { t: "Movement Snacks", d: "Metabolic governance" }] },
+        { g: "Nutrition & Timing", c: P.hit, cards: [{ t: "Time-Restricted Eating", d: "Metabolic strategy" }, { t: "Why We Don’t Count Calories", d: "The protocol is the deficit" }, { t: "Fats, Carbs & Fiber", d: "Guardrails, not trackers" }] },
+        { g: "Supplementation", c: "#8a94a4", cards: [{ t: "The Supplement Stack", d: "Evidence-based, physician-selected" }] },
+      ].map(gr => (
+        <div key={gr.g} style={{ marginBottom: 18 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 8 }}>
+            <div style={{ width: 18, height: 2, background: gr.c, borderRadius: 1, opacity: .5 }} />
+            <span style={{ fontSize: 8, letterSpacing: 2.5, color: gr.c, textTransform: "uppercase", fontWeight: 500, fontFamily: sn }}>{gr.g}</span>
+          </div>
+          {gr.cards.map(cd => (
+            <div key={cd.t} style={{ background: P.bgCard, borderRadius: P.r, padding: "12px 14px", border: "1px solid " + (cd.hi ? P.accent + "35" : P.border), borderLeft: "3px solid " + gr.c + (cd.hi ? "" : "25"), marginBottom: 7, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div><div style={{ fontFamily: sf, fontSize: 12.5, fontWeight: 400, color: cd.hi ? P.text : "#c0c8d4" }}>{cd.t}</div><div style={{ fontFamily: sn, fontSize: 10, color: P.textDim, marginTop: 2 }}>{cd.d}</div></div>
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>{cd.hi && <Badge>NEW</Badge>}<span style={{ fontSize: 9, color: P.textDim }}>{"▼"}</span></div>
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+
+  /* ─── 8. mTOR ─── */
+  const S7 = () => {
+    const [arcDraw, setArcDraw] = useState(false);
+    useEffect(() => { const t = setTimeout(() => setArcDraw(true), 500); return () => clearTimeout(t); }, []);
+    const sz = 180, cx = 90, cy = 90, r = 66, sw = 13, ci = 2 * Math.PI * r;
+    return (
+      <div>
+        <Narration header="This is why every Écire protocol converges." sub="The molecular switch between building muscle and repairing cells. Your body can’t do both at once — but Écire cycles between them every day." />
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 18 }}>
+          <svg width={sz} height={sz}>
+            <circle cx={cx} cy={cy} r={r} fill="none" stroke={P.bgInput} strokeWidth={sw} />
+            <circle cx={cx} cy={cy} r={r} fill="none" stroke={P.lavender} strokeWidth={sw - 2}
+              strokeDasharray={arcDraw ? ((ci * .67 - 3) + " " + (ci * .33 + 3)) : ("0 " + ci)}
+              strokeDashoffset={ci * .25} strokeLinecap="round"
+              style={{ filter: "drop-shadow(0 0 5px " + P.lavender + "35)", transition: "stroke-dasharray 1.2s cubic-bezier(0.25,0.46,0.45,0.94)" }} />
+            <circle cx={cx} cy={cy} r={r} fill="none" stroke={P.green} strokeWidth={sw - 2}
+              strokeDasharray={arcDraw ? ((ci * .33 - 3) + " " + (ci * .67 + 3)) : ("0 " + ci)}
+              strokeDashoffset={ci * .25 - ci * .67} strokeLinecap="round"
+              style={{ filter: "drop-shadow(0 0 5px " + P.green + "35)", transition: "stroke-dasharray 1.2s cubic-bezier(0.25,0.46,0.45,0.94) .3s" }} />
+            <text x={cx} y={cy - 10} textAnchor="middle" fill={P.text} fontSize="13" fontWeight="300" fontFamily={sf}>mTOR</text>
+            <text x={cx} y={cy + 4} textAnchor="middle" fill={P.textDim} fontSize="8.5" fontFamily={sn}>Growth / Repair</text>
+            <text x={cx} y={cy + 15} textAnchor="middle" fill={P.textDim} fontSize="7.5" fontFamily={sn}>Cycle</text>
+          </svg>
+        </div>
+        {[{ l: "Fasting Window", p: "16h", c: P.lavender, m: "mTOR OFF → Autophagy ON", d: "No amino acids → mTOR suppressed → cells shift to deep repair. Damaged mitochondria cleared, misfolded proteins recycled, cellular aging slows." },
+          { l: "Eating Window", p: "8h", c: P.green, m: "mTOR ON → Muscle Synthesis", d: "High protein (150g target) floods cells with leucine → mTOR activated → muscle protein synthesis, lean mass preservation, BMR maintenance." },
+        ].map((s, i) => (
+          <div key={s.l} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "13px 15px", background: s.c + "08", borderRadius: P.r, border: "1px solid " + s.c + "18", marginBottom: 10, opacity: 0, animation: `fu .5s ease ${.8 + i * .3}s forwards` }}>
+            <div style={{ width: 11, height: 11, borderRadius: P.r, background: s.c, flexShrink: 0, marginTop: 3 }} />
+            <div><div style={{ fontSize: 11, fontWeight: 500, color: s.c, fontFamily: sn }}>{s.l} <span style={{ fontWeight: 400, color: P.textDim }}>({s.p})</span></div><div style={{ fontSize: 10.5, color: P.accent, fontWeight: 500, margin: "2px 0", fontFamily: sn }}>{s.m}</div><div style={{ fontSize: 10.5, color: P.textSoft, lineHeight: 1.7, fontFamily: sn }}>{s.d}</div></div>
+          </div>
+        ))}
+        <div style={{ background: P.accent + "06", borderRadius: P.r, padding: "13px 16px", marginTop: 10, border: "1px solid " + P.accent + "10", opacity: 0, animation: "fu .5s ease 1.5s forwards" }}>
+          <p style={{ fontFamily: sn, fontSize: 10.5, color: P.textSoft, lineHeight: 1.8, margin: "0 0 8px" }}>Key convergence: TRE, high protein, resistance training, Zone 2, green tea, turmeric {"—"} all mTOR-aware.</p>
+          <p style={{ fontFamily: sf, fontSize: 13, fontWeight: 300, fontStyle: "italic", color: P.accent, lineHeight: 1.8, margin: 0, textAlign: "center" }}>They are not random. They are mTOR-aware.</p>
+        </div>
+      </div>
+    );
+  };
+
+  /* ─── 9. YOUR CYCLE ─── */
+  const S8 = () => (
+    <div>
+      <Narration header="Your metabolism shifts across your cycle. We help you adjust." sub="We give you guidance on how to adapt your approach based on the hormonal environment your body is in right now." />
+      {[{ ph: "Menstrual", dy: "Days 1–5", c: P.pink, i: "\uD83C\uDF11", hm: "Estrogen + progesterone at their lowest. Body is resetting.", rc: "We suggest gentler movement, iron-rich foods, and moderate fasting windows. Your body is recovering — honor that." },
+        { ph: "Follicular", dy: "Days 6–14", c: P.lavender, i: "\uD83C\uDF12", hm: "Estrogen rising steadily. Insulin sensitivity at its peak.", rc: "TRE is most effective here. We suggest leaning into higher intensity training and building new habits. Your hormonal environment is working with you." },
+        { ph: "Ovulatory", dy: "Days 12–16", c: P.accent, i: "\uD83C\uDF15", hm: "Estrogen peaks. Testosterone at its highest.", rc: "We suggest challenging workouts and high-protein meals. This is your performance window — use it." },
+        { ph: "Luteal", dy: "Days 15–28", c: P.blue, i: "\uD83C\uDF18", hm: "Progesterone dominant. Cravings intensify. BMR naturally rises +100–300 cal/day.", rc: "We suggest shorter fasting windows and magnesium-rich foods. If you’re hungrier, that’s not a lack of discipline — it’s progesterone." },
+      ].map((p, i) => (
+        <div key={p.ph} style={{ background: P.bgCard, borderRadius: P.r, padding: "14px 16px", borderLeft: "3px solid " + p.c + "45", border: "1px solid " + P.border, marginBottom: 10, opacity: 0, animation: `fu .4s ease ${.3 + i * .2}s forwards` }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+            <span style={{ fontSize: 17 }}>{p.i}</span>
+            <div><div style={{ fontFamily: sf, fontSize: 13, fontWeight: 400, color: p.c }}>{p.ph}</div><div style={{ fontFamily: sn, fontSize: 9, color: P.textMuted }}>{p.dy}</div></div>
+          </div>
+          <div style={{ marginBottom: 7 }}><div style={{ fontSize: 8, letterSpacing: 1.5, color: p.c, textTransform: "uppercase", fontWeight: 500, fontFamily: sn, marginBottom: 3 }}>Hormones</div><p style={{ fontSize: 10.5, color: P.textDim, lineHeight: 1.7, margin: 0, fontFamily: sn }}>{p.hm}</p></div>
+          <div><div style={{ fontSize: 8, letterSpacing: 1.5, color: p.c, textTransform: "uppercase", fontWeight: 500, fontFamily: sn, marginBottom: 3 }}>How to Adjust</div><p style={{ fontSize: 10.5, color: P.textSoft, lineHeight: 1.7, margin: 0, fontFamily: sn }}>{p.rc}</p></div>
+        </div>
+      ))}
+    </div>
+  );
+
+  /* ─── 10. EQUITY + CLOSE ─── */
+  const S9 = () => (
+    <div>
+      <Narration header="Built for the physiology that actually exists." sub="The system wasn’t broken for Black women. It was never built for them. “Eat healthy and exercise” was not advice — it was an abdication. So Écire was built — every protocol, every plate, every metric — from the physiology up." />
+      {[{ t: "Fat Cell Biology", st: "Hyperplasia vs. Hypertrophy", c: P.pink, b: "Adipose tissue develops differently across populations. New fat cells, once created, never disappear — they shrink but persist. The industry prescribes one protocol and blames the individual when it doesn’t work." },
+        { t: "Cultural Fluency", st: "Clinical expertise, not a separate program", c: P.blue, b: "The metabolic science is universal. But Dr. Hammond brings a cultural literacy that most physicians lack. ‘Eat healthy and exercise’ was never a prescription — it was an abdication." },
+        { t: "Allostatic Load", st: "Systemic stress as physiology, not context", c: P.accent, b: "Chronic exposure to systemic racism and medical dismissal produces measurably higher cortisol, earlier insulin resistance, greater visceral fat, and accelerated biological aging. Écire tracks this as a core metabolic variable." },
+      ].map((s, i) => (
+        <div key={i} onClick={() => setExp(exp === ("c" + i) ? null : "c" + i)} style={{ background: s.c + "06", borderRadius: P.r, marginBottom: 10, border: "1px solid " + s.c + "12", cursor: "pointer", overflow: "hidden" }}>
+          <div style={{ padding: "14px 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div><div style={{ fontSize: 9, letterSpacing: 2, color: s.c, textTransform: "uppercase", fontWeight: 500, fontFamily: sn }}>{s.t}</div><div style={{ fontSize: 11, color: P.textDim, marginTop: 2, fontFamily: sn }}>{s.st}</div></div>
+            <span style={{ fontSize: 9, color: P.textDim, transform: exp === ("c" + i) ? "rotate(180deg)" : "none", transition: "transform .3s" }}>{"▼"}</span>
+          </div>
+          {exp === ("c" + i) && <p style={{ fontFamily: sn, fontSize: 11, color: P.textSoft, lineHeight: 2, margin: 0, padding: "0 16px 14px" }}>{s.b}</p>}
+        </div>
+      ))}
+      <div style={{ padding: "20px 16px", textAlign: "center", margin: "8px 0 18px" }}>
+        <p style={{ fontFamily: sf, fontSize: 14, fontWeight: 300, fontStyle: "italic", color: P.accent, lineHeight: 2, margin: 0 }}>Alignment means building from the physiology that actually exists {"—"} not the one that was assumed.</p>
+      </div>
+      <div style={{ width: 40, height: 1, background: P.accent + "25", margin: "0 auto 20px" }} />
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", marginBottom: 20 }}>
+        <div style={{ marginBottom: 8 }}><OM size={48} variant="icon" /></div>
+        <h2 style={{ fontFamily: sf, fontSize: "1.6rem", fontWeight: 300, color: P.text, letterSpacing: 5, margin: "0 0 4px" }}>ÉCIRE</h2>
+        <div style={{ fontFamily: sn, fontSize: 9, letterSpacing: 3, color: P.textDim, textTransform: "uppercase", marginBottom: 18 }}>HEALTH</div>
+      </div>
+      <div style={{ display: "grid", gap: 8, marginBottom: 22 }}>
+        {[{ i: "\uD83E\uDDEC", l: "Metabolic Science", d: "Peer-reviewed, mTOR-aware protocols" },
+          { i: "\uD83D\uDCCA", l: "Écire’s EHR Platform", d: "Labs, health data, and wearables integrated" },
+          { i: "\uD83D\uDCAC", l: "Direct Communication", d: "Broadcast, group cohort, and 1:1 messages" },
+          { i: "\uD83C\uDF7D\uFE0F", l: "The Essentialist Plate™", d: "A structural playbook for meals — plus recipes, budget and time adjustments" },
+          { i: "\uD83C\uDF19", l: "Cycle-Based Guidance", d: "Adjust your approach to match your hormonal environment" },
+          { i: "\uD83D\uDCF1", l: "Daily Protocol Tracker", d: "Protein, TRE, movement, supplements — no calorie counting" },
+          { i: "✦", l: "REAP & STILL Rituals", d: "Morning alignment and evening restoration" },
+        ].map(f => (
+          <div key={f.l} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "12px 14px", background: P.bgCard, borderRadius: P.r, border: "1px solid " + P.border, textAlign: "left" }}>
+            <span style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}>{f.i}</span>
+            <div><div style={{ fontFamily: sn, fontSize: 11, fontWeight: 500, color: P.text }}>{f.l}</div><div style={{ fontFamily: sn, fontSize: 10, color: P.textDim, marginTop: 1 }}>{f.d}</div></div>
+          </div>
+        ))}
+      </div>
+      <div style={{ textAlign: "center", padding: "16px 0" }}>
+        <p style={{ fontFamily: sf, fontSize: 16, fontWeight: 300, fontStyle: "italic", color: P.accent, lineHeight: 2 }}>Sovereignty. Wholeness. Restoration.</p>
+        <p style={{ fontFamily: sn, fontSize: 10, color: P.textDim, marginTop: 10 }}>Founded by Dr. Gmerice Hammond, MD, MPH</p>
+      </div>
+    </div>
+  );
+
+  const screens = [S0, S1, S2, S3, S4, SMeals, S5, S6, S7, S8, S9];
+  const Cur = screens[step];
+
+  return (
+    <div style={{ minHeight: "100vh", background: P.bg, color: P.text, fontFamily: sn, position: "relative", overflow: "hidden" }}>
+      <style>{`
+        @keyframes pageIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes scrollBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+        @keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes slideIn{from{opacity:0;transform:translateX(-16px)}to{opacity:1;transform:translateX(0)}}
+        @keyframes pulse{0%,100%{opacity:.5;box-shadow:0 0 4px ${P.accent}30}50%{opacity:1;box-shadow:0 0 12px ${P.accent}50}}
+        *{box-sizing:border-box;margin:0;padding:0}
+        ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:${P.accent}25;border-radius:4px}
+      `}</style>
+      <div style={{ position: "fixed", top: -200, left: "50%", transform: "translateX(-50%)", width: 500, height: 500, borderRadius: "50%", pointerEvents: "none", background: `radial-gradient(circle, ${P.lavender}06 0%, transparent 70%)` }} />
+
+      {/* Top bar */}
+      <div style={{ position: "sticky", top: 0, zIndex: 100, background: P.bg + "ee", backdropFilter: "blur(16px)", borderBottom: "1px solid " + P.border, padding: "10px 18px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+          <OM size={24} />
+          <span style={{ fontFamily: sf, fontSize: 13, fontWeight: 300, letterSpacing: 4, color: P.textSoft }}>ÉCIRE</span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ fontFamily: sn, fontSize: 8, letterSpacing: 2, color: P.textMuted, textTransform: "uppercase" }}>{STEPS[step].label}</span>
+          <span style={{ fontFamily: sn, fontSize: 9, color: P.textDim }}>{step + 1}/{STEPS.length}</span>
+        </div>
+      </div>
+
+      {/* Progress */}
+      <div style={{ position: "sticky", top: 46, zIndex: 99, height: 2, background: P.bgInput }}>
+        <div style={{ height: "100%", width: ((step + 1) / STEPS.length * 100) + "%", background: `linear-gradient(90deg,${P.lavender},${P.accent})`, transition: "width .5s ease", borderRadius: 1 }} />
+      </div>
+
+      {/* Content */}
+      <div key={step} style={{ maxWidth: 460, margin: "0 auto", padding: "24px 18px 130px", animation: "pageIn .7s ease both" }}><Cur /></div>
+
+      <ScrollHint step={step} />
+
+      {/* Nav */}
+      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 100, background: P.bg + "f2", backdropFilter: "blur(12px)", borderTop: "1px solid " + P.border, padding: "10px 18px 16px" }}>
+        <div style={{ display: "flex", justifyContent: "center", gap: 5, marginBottom: 10 }}>
+          {STEPS.map((_, i) => (
+            <div key={i} onClick={() => goTo(i)} style={{ width: i === step ? 18 : 5, height: 5, borderRadius: 3, cursor: "pointer", background: i === step ? P.accent : i < step ? P.lavender + "35" : P.textMuted + "25", transition: "all .3s" }} />
+          ))}
+        </div>
+        <div style={{ display: "flex", gap: 12, justifyContent: "center", alignItems: "center" }}>
+          <div onClick={goPrev} style={{ padding: "9px 20px", borderRadius: P.r, cursor: step > 0 ? "pointer" : "default", border: "1px solid " + (step > 0 ? P.border : "transparent"), color: step > 0 ? P.textDim : "transparent", fontSize: 11, fontWeight: 500, fontFamily: sn, letterSpacing: 1 }}>{"←"} Back</div>
+          <div onClick={() => { playRef.current = !playRef.current; setPlaying(p => !p); }} style={{ padding: "9px 16px", borderRadius: P.r, cursor: "pointer", border: "1px solid " + P.border, color: P.textDim, fontSize: 11, fontFamily: sn, display: "flex", alignItems: "center", gap: 6 }}>
+            <span style={{ fontSize: 10 }}>{playing ? "⏸" : "▶"}</span>
+            <Countdown duration={STEPS[step].dur} playing={playing} step={step} />
+          </div>
+          {step < STEPS.length - 1 ? (
+            <div onClick={advance} style={{ padding: "9px 28px", borderRadius: P.r, cursor: "pointer", background: P.lavender, color: "#fff", fontSize: 11, fontWeight: 500, fontFamily: sn, letterSpacing: 1, boxShadow: "0 0 16px " + P.lavender + "25" }}>Next {"→"}</div>
+          ) : (
+            <div onClick={() => { goTo(0); playRef.current = true; setPlaying(true); }} style={{ padding: "9px 24px", borderRadius: P.r, cursor: "pointer", background: P.accent + "12", color: P.accent, fontSize: 11, fontWeight: 500, fontFamily: sn, letterSpacing: 1, border: "1px solid " + P.accent + "20" }}>{"↻"} Replay</div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(React.createElement(EcireDemo));
+  </script>
+</body>
+</html>
